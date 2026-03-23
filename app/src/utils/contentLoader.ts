@@ -1,6 +1,6 @@
 import type { Post, Thread } from "../types";
 
-const modules = import.meta.glob("/content/**/*.md", {
+const modules = import.meta.glob("../../../content/**/*.md", {
   query: "?raw",
   import: "default",
   eager: true,
@@ -65,7 +65,7 @@ const loadPosts = (): Post[] => {
   if (cached.posts) return cached.posts;
 
   const posts: Post[] = Object.entries(modules).map(([path, raw]) => {
-    const relative = path.replace(/^\/content\//, "");
+    const relative = path.replace(/^.*\/content\//, "");
     const segments = relative.split("/");
     const threadId = segments.shift() ?? "general";
     const slug = segments.join("/").replace(/\.md$/, "");

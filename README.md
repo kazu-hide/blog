@@ -1,37 +1,68 @@
-# My Blog
+# Blog
 
-https://zawapap.github.io/myBlog/
+個人ブログとQiita記事を一元管理するモノリポ。
 
-Vite + React + TypeScript で構築したエンジニア向けブログ。GitHub Pages にデプロイし、Markdown 投稿をスレッド単位でまとめて閲覧できます。UI は Material UI のみで構成しています。
+## 構造
 
-## 画面
+```
+blog/
+├── app/              # ブログアプリ（React + Vite + TypeScript）
+├── content/
+│   ├── tech/         # 技術記事（myBlog + Qiita に投稿）
+│   └── personal/     # 個人ログ（myBlog のみ）
+├── qiita/
+│   └── public/       # Qiita CLI 用（既存記事 + sync で生成）
+├── scripts/
+│   └── sync-to-qiita.ts  # tech/ → qiita/public/ 変換スクリプト
+└── .github/workflows/
+    ├── deploy-blog.yml    # GitHub Pages デプロイ
+    └── publish-qiita.yml  # Qiita 公開
+```
 
-- `Posts`(ホーム): すべての投稿を新しい順で並べたタイムライン。
-- `Threads`: スレッド一覧。チャレンジやカテゴリ単位でまとめた投稿を閲覧。
-
-## 開発環境
+## 開発
 
 ```bash
-npm install
-npm run dev
+npm run dev       # ローカル開発サーバー起動
+npm run build     # ビルド
+npm run preview   # ビルド結果のプレビュー
 ```
 
-## 投稿の追加
+## 記事の書き方
 
-1. `content/<thread>/<slug>.md` を作成。フォルダ名がスレッド ID になります。
-2. 冒頭に Frontmatter を記述:
+### 技術記事（myBlog + Qiita）
 
+`content/tech/` に Markdown を作成：
+
+```markdown
+---
+title: "記事タイトル"
+date: "2026-03-23"
+excerpt: "概要"
+threadTitle: "スレッド名"
+qiita:
+  tags: ["Python", "FastAPI"]
+  emoji: "🐍"
+---
+本文
 ```
+
+`qiita` フィールドがある記事は push 時に自動で Qiita にも公開されます。
+
+### 個人ログ（myBlog のみ）
+
+`content/personal/` に Markdown を作成：
+
+```markdown
 ---
 title: "タイトル"
-date: "2025-01-10"
-excerpt: "任意: 一覧で表示する短い概要"
-threadTitle: "任意: スレッド表示名"
-threadDescription: "任意: スレッド説明"
+date: "2026-03-23"
+excerpt: "概要"
+threadTitle: "スレッド名"
 ---
-本文をMarkdownで記述
+本文
 ```
 
-- `excerpt`/`threadDescription` は省略可能です。`excerpt` が無い場合は本文から自動生成され、`threadDescription` が無いスレッドは最初の投稿の概要を利用します。
+## デプロイ
 
-3. ファイルをコミットすると、ビルド時に自動的に読み込まれます。
+- **myBlog**: `main` に push → GitHub Actions → GitHub Pages
+- **Qiita**: `content/tech/` に変更を push → sync スクリプト → Qiita API
